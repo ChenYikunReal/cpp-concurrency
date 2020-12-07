@@ -1,5 +1,7 @@
 # C++多线程编程
 
+![](cpp.png)
+
 1.派生4个线程，分别打印问候消息：
 ```cpp
 #include <iostream>
@@ -77,7 +79,7 @@ int main() {
 }
 ```
 
-4.添加future的内容：
+4.添使用promise和future进行异步通信：
 ```cpp
 #include <iostream>
 #include <cstdint>
@@ -117,26 +119,97 @@ int main() {
 }
 ```
 
+5.在同一个容器中存储几个封装不同函数的任务，函数又有不同的实际参数，通过一个自制的任务工厂实现：
 ```cpp
+#include <iostream>
+#include <future>
+#include <functional>
 
+using namespace std;
+
+template<typename Func, typename ...Args, typename Rtrn = typename result_of<Func(Args...)>::type> auto make_task(Func &&func, Args &&...args) -> packaged_task<Rtrn(void)> {
+    auto aux = bind(forward<Func>(func), forward<Args>(args)...);
+    auto task = packaged_task<Rtrn(void)>(aux);
+    return task;
+}
 ```
 
+6.在自制的make_task工厂实现一个线程池，在队列中维护这些任务：
 ```cpp
+#include <iostream>
+#include <cstdint>
+#include <vector>
+#include <thread>
+#include <future>
+#include <functional>
 
+using namespace std;
+
+template<typename Func, typename ...Args, typename Rtrn = typename result_of<Func(Args...)>::type> auto make_task(Func &&func, Args &&...args) -> packaged_task<Rtrn(void)> {
+    auto aux = bind(forward<Func>(func), forward<Args>(args)...);
+    auto task = packaged_task<Rtrn(void)>(aux);
+    return task;
+}
+
+uint64_t fibonacci(uint64_t n) {
+    uint64_t a_0 = 0;
+    uint64_t a_1 = 1;
+    for (uint64_t index = 0; index < n; index++) {
+        const uint64_t temp = a_0;
+        a_0 = a_1;
+        a_1 += temp;
+    }
+    return a_0;
+}
+
+int main() {
+    const uint64_t num_threads = 32;
+    vector<thread> threads;
+    vector<future<uint64_t>> results;
+    for (uint64_t id = 0; id < num_threads; id++) {
+        auto task = make_task(fibonacci, id);
+        results.emplace_back(task.get_future());
+        threads.emplace_back(move(task));
+    }
+    for (auto& result : results) {
+        cout << result.get() << endl;
+    }
+    for (auto& thread : threads) {
+        thread.detach();
+    }
+    return 0;
+}
 ```
 
+7.async异步方式：
 ```cpp
+#include <iostream>
+#include <cstdint>
+#include <vector>
+#include <future>
 
-```
+using namespace std;
 
-```cpp
+uint64_t fibonacci(uint64_t n) {
+    uint64_t a_0 = 0;
+    uint64_t a_1 = 1;
+    for (uint64_t index = 0; index < n; index++) {
+        const uint64_t temp = a_0;
+        a_0 = a_1;
+        a_1 += temp;
+    }
+    return a_0;
+}
 
-```
-
-```cpp
-
-```
-
-```cpp
-
+int main() {
+    const uint64_t num_threads = 32;
+    vector<future<uint64_t>> results;
+    for (uint64_t id = 0; id < num_threads; id++) {
+        results.emplace_back(async(launch::async, fibonacci, id));
+    }
+    for (auto& result : results) {
+        cout << result.get() << endl;
+    }
+    return 0;
+}
 ```
