@@ -30,7 +30,8 @@ int main() {
 
 2.迭代计算第n个Fibonacci数的基本函数模板
 ```cpp
-template <typename value_t, typename index_t> value_t fibonacci(value_t n) {
+template <typename value_t, typename index_t>
+value_t fibonacci(value_t n) {
     value_t a_0 = 0;
     value_t a_1 = 1;
     for (index_t index = 0; index < n; index++) {
@@ -51,7 +52,8 @@ template <typename value_t, typename index_t> value_t fibonacci(value_t n) {
 
 using namespace std;
 
-template <typename value_t, typename index_t> void fibonacci(value_t n, value_t *result) {
+template <typename value_t, typename index_t>
+void fibonacci(value_t n, value_t *result) {
     value_t a_0 = 0;
     value_t a_1 = 1;
     for (index_t index = 0; index < n; index++) {
@@ -89,7 +91,8 @@ int main() {
 
 using namespace std;
 
-template <typename value_t, typename index_t> void fibonacci(value_t n, promise<value_t> &&result) {
+template <typename value_t, typename index_t>
+void fibonacci(value_t n, promise<value_t> &&result) {
     value_t a_0 = 0;
     value_t a_1 = 1;
     for (index_t index = 0; index < n; index++) {
@@ -127,7 +130,8 @@ int main() {
 
 using namespace std;
 
-template<typename Func, typename ...Args, typename Rtrn = typename result_of<Func(Args...)>::type> auto make_task(Func &&func, Args &&...args) -> packaged_task<Rtrn(void)> {
+template<typename Func, typename ...Args, typename Rtrn = typename result_of<Func(Args...)>::type>
+auto make_task(Func &&func, Args &&...args) -> packaged_task<Rtrn(void)> {
     auto aux = bind(forward<Func>(func), forward<Args>(args)...);
     auto task = packaged_task<Rtrn(void)>(aux);
     return task;
@@ -145,7 +149,8 @@ template<typename Func, typename ...Args, typename Rtrn = typename result_of<Fun
 
 using namespace std;
 
-template<typename Func, typename ...Args, typename Rtrn = typename result_of<Func(Args...)>::type> auto make_task(Func &&func, Args &&...args) -> packaged_task<Rtrn(void)> {
+template<typename Func, typename ...Args, typename Rtrn = typename result_of<Func(Args...)>::type>
+auto make_task(Func &&func, Args &&...args) -> packaged_task<Rtrn(void)> {
     auto aux = bind(forward<Func>(func), forward<Args>(args)...);
     auto task = packaged_task<Rtrn(void)>(aux);
     return task;
